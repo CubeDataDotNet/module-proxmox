@@ -238,7 +238,7 @@ class ProxmoxVserver
      */
     public function terminate(array $vars)
     {
-        $this->stop($vars);
+        $this->shutdown($vars);
         return $this->api->submit(
             'nodes/' . $vars['node'] . '/' . $vars['type'] . '/' . $vars['vmid'],
             [],
