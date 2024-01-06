@@ -221,7 +221,7 @@ class ProxmoxVserver
     {
         $config = $this->api->submit(
             'nodes/' . $vars['node'] . '/' . $vars['type'] . '/' . $vars['vmid'] . '/vncproxy',
-            [],
+            ['websocket' => 1],
             'POST'
         );
 		$websock = $this->api->submit(

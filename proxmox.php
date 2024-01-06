@@ -1927,7 +1927,7 @@ class Proxmox extends Module
 			//novnc client is there continue with noVNC creation
 			$vncresponse = $this->parseResponse($server_api->vncprocess($params), $module_row);
 			// Set console info for noVNC
-			$vnc_url = $module_row->meta->host . ":" . $module_row->meta->port . "/?console=" . $service_fields->proxmox_type . "&novnc=1&node=" . $service_fields->proxmox_node . "&resize=scale&vmid=" . $service_fields->proxmox_vserver_id . "&path=api2/json/nodes/server-node/qemu/". $service_fields->proxmox_vserver_id ."/vncwebsocket?port=" . $response->data->port . "&vncticket=" . $response->data->ticket; 
+			$vnc_url = $module_row->meta->host . ":" . $module_row->meta->port . "/?console=" . $service_fields->proxmox_type . "&novnc=1&node=" . $service_fields->proxmox_node . "&resize=scale&vmid=" . $service_fields->proxmox_vserver_id . "&path=api2/json/nodes/". $service_fields->proxmox_node ."/". $service_fields->proxmox_type . "/" .  $service_fields->proxmox_vserver_id ."/vncwebsocket?port=" . $response->data->port . "&vncticket=" . $response->data->ticket; 
 			$this->view->set('node_statistics', $this->getNodeStatistics($service_fields->proxmox_node, $module_row));
 			$this->view->set('console_vnc', (object)$vnc_url);
 			$this->view->setDefaultView('components' . DS . 'modules' . DS . 'proxmox' . DS);
