@@ -5,7 +5,7 @@
     <div class="pad">
 		<?php if (isset($console_vnc)) {
 		?>
-		<iframe src="<?php echo (isset($console_vnc) ? $this->Html->safe($console_vnc) : "No URL Defined");?" frameborder="0" scrolling="no" width="1024px" height="100%"></iframe>
+		<iframe src="<?php echo (isset($console_vnc) ? $this->Html->safe($console_vnc) : "No URL Defined");?>" frameborder="0" scrolling="no" width="1024px" height="100%"></iframe>
 		<?php } else {
 		?>
 		<ul>
