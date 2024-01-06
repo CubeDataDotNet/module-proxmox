@@ -3,12 +3,20 @@
         <h3><?php $this->_('Proxmox.tab_console.heading_console');?></h3>
     </div>
     <div class="pad">
-        <ul>
+		<?php if (isset($console_vnc)) {
+		?>
+		<iframe src="<?php echo (isset($console->vnc_url) ? $this->Html->safe($console->vnc_url) : "No URL Defined");?" frameborder="0" scrolling="no" width="1024px" height="100%"></iframe>
+		<?php } else {
+		?>
+		<ul>
             <li><?php $this->_('Proxmox.tab_console.vnc_ip');?> <?php echo (isset($console->vnc_ip) ? $this->Html->safe($console->vnc_ip) : null);?></li>
             <li><?php $this->_('Proxmox.tab_console.vnc_port');?> <?php echo (isset($console->vnc_port) ? $this->Html->safe($console->vnc_port) : null);?></li>
             <li><?php $this->_('Proxmox.tab_console.vnc_user');?> <?php echo (isset($console->vnc_user) ? $this->Html->safe($console->vnc_user) : null);?></li>
             <li><?php $this->_('Proxmox.tab_console.vnc_password');?> <?php echo (isset($console->vnc_password) ? $this->Html->safe($console->vnc_password) : null);?></li>
         </ul>
+		<?php }
+		?>
+		
     </div>
 
 <script type="text/javascript">

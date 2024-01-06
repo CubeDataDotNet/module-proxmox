@@ -207,6 +207,30 @@ class ProxmoxVserver
             'POST'
         );
     }
+	
+	/**
+     * Get VNC info and return websocket info.
+     *
+     * @param array $vars An array of input params including:
+     *  - vmid The virtual server ID
+     *  - node Name of the node
+     *  - type Type of VM
+     * @return ProxmoxResponse
+     */
+    public function vncprocess(array $vars)
+    {
+        $config = $this->api->submit(
+            'nodes/' . $vars['node'] . '/' . $vars['type'] . '/' . $vars['vmid'] . '/vncproxy',
+            [],
+            'POST'
+        );
+		$websock = $this->api->submit(
+            'nodes/' . $vars['node'] . '/' . $vars['type'] . '/' . $vars['vmid'] . '/vncwebsocket',
+            ['vncticket' => $config->data->ticket,'port' => $config->data->port],
+            'POST'
+        );
+		return $websock;
+    }
 
     /**
      * Terminate a Virtual Server

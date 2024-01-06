@@ -1639,6 +1639,18 @@ class Proxmox extends Module
                     $this->performAction('boot', $params['vmid'], $params['type'], $params['node'], $module_row, [], true);
 
                     break;
+                case 'unmount':
+                    if ($service_fields->proxmox_type != 'qemu') {
+                        break;
+                    }
+                    $this->performAction(
+                        'unmountIso',
+                        $service_fields->proxmox_vserver_id,
+                        $service_fields->proxmox_type,
+                        $service_fields->proxmox_node,
+                        $module_row
+                    );
+                    break;
                 default:
                     break;
             }
@@ -1906,25 +1918,36 @@ class Proxmox extends Module
             'node' => $service_fields->proxmox_node
         ];
 
-        $response = $this->parseResponse($server_api->vnc($params), $module_row);
+        // Check whether the VNC vendor code is available
+		//not needed since the check is done below for noVNC
+        //$this->view->set('vnc_applet_available', is_dir(VENDORDIR . 'vnc'));
+		
+		if (is_dir(VENDORDIR . 'vnc'))
+		{
+			//novnc client is there continue with noVNC creation
+			$vncresponse = $this->parseResponse($server_api->vncprocess($params), $module_row);
+			// Set console info for noVNC
+			$vnc_url = $module_row->meta->host . ":" . $module_row->meta->port . "/?console=" . $service_fields->proxmox_type . "&novnc=1&node=" . $service_fields->proxmox_node . "&resize=scale&vmid=" . $service_fields->proxmox_vserver_id . "&path=api2/json/nodes/server-node/qemu/". $service_fields->proxmox_vserver_id ."/vncwebsocket?port=" . $response->data->port . "&vncticket=" . $response->data->ticket; 
+			$this->view->set('node_statistics', $this->getNodeStatistics($service_fields->proxmox_node, $module_row));
+			$this->view->set('console_vnc', (object)$vnc_url);
+			$this->view->setDefaultView('components' . DS . 'modules' . DS . 'proxmox' . DS);
+			return $this->view;
+		} else {
+			$response = $this->parseResponse($server_api->vnc($params), $module_row);
 
-        // Set console info
-        $session = [
+			// Set console info
+			$session = [
             'vnc_ip' => $module_row->meta->host,
             'vnc_user' => $response->data->user,
             'vnc_password' => $response->data->ticket,
             'vnc_port' => $response->data->port,
             'vnc_cert' => str_replace("\n", '|', $response->data->cert)
-        ];
-
-        // Check whether the VNC vendor code is available
-        $this->view->set('vnc_applet_available', is_dir(VENDORDIR . 'vnc'));
-
-        $this->view->set('node_statistics', $this->getNodeStatistics($service_fields->proxmox_node, $module_row));
-        $this->view->set('console', (object)$session);
-
-        $this->view->setDefaultView('components' . DS . 'modules' . DS . 'proxmox' . DS);
-        return $this->view;
+			];
+			$this->view->set('node_statistics', $this->getNodeStatistics($service_fields->proxmox_node, $module_row));
+			$this->view->set('console', (object)$session);
+			$this->view->setDefaultView('components' . DS . 'modules' . DS . 'proxmox' . DS);
+			return $this->view;
+		}
     }
 
     /**

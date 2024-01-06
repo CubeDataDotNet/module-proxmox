@@ -1,6 +1,11 @@
 
     <h4><?php $this->_('Proxmox.tab_client_console.heading_console');?></h4>
     <div class="table-responsive">
+		<?php if (isset($console_vnc)) {
+		?>
+		<iframe src="<?php echo (isset($console->vnc_url) ? $this->Html->safe($console->vnc_url) : "No URL Defined");?" frameborder="0" scrolling="no" width="1024px" height="100%"></iframe>
+		<?php } else {
+		?>
         <table class="table table-striped">
             <tbody>
                 <tr>
@@ -21,4 +26,7 @@
                 </tr>
             </tbody>
         </table>
+		<?php 
+		}
+		?>
     </div>
