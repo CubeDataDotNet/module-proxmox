@@ -1919,9 +1919,17 @@ class Proxmox extends Module
         ];
 		
 			//noVNC client is used via Proxmox Node, therefore no need for noVNC files for now.
-			$vncresponse = $this->parseResponse($server_api->vncprocess($params), $module_row);
+			$response = $this->parseResponse($server_api->vnc($params), $module_row);
+			$session_params = [
+            'vmid' => $service_fields->proxmox_vserver_id,
+            'type' => $service_fields->proxmox_type,
+            'node' => $service_fields->proxmox_node,
+			'vnc_ticket' => $response->data->ticket,
+			'vnc_portid' => $response->data->port
+			];
+			$vncresponse = $this->parseResponse($server_api->vncgetwebsocketproxy($session_params), $module_row);
 			// Set console info for noVNC
-			$vnc_url = $module_row->meta->host . ":" . $module_row->meta->port . "/?console=" . $service_fields->proxmox_type . "&novnc=1&node=" . $service_fields->proxmox_node . "&resize=scale&vmid=" . $service_fields->proxmox_vserver_id . "&path=api2/json/nodes/". $service_fields->proxmox_node ."/". $service_fields->proxmox_type . "/" .  $service_fields->proxmox_vserver_id ."/vncwebsocket?port=" . $response->data->port . "&vncticket=" . $response->data->ticket; 
+			$vnc_url = $module_row->meta->host . ":" . $module_row->meta->port . "/?console=" . $service_fields->proxmox_type . "&novnc=1&node=" . $service_fields->proxmox_node . "&resize=scale&vmid=" . $service_fields->proxmox_vserver_id . "&path=" . urlencode("api2/json/nodes/". $service_fields->proxmox_node ."/". $service_fields->proxmox_type . "/" .  $service_fields->proxmox_vserver_id ."/vncwebsocket?port=" . $response->data->port . "&vncticket=" . $response->data->ticket); 
 			$this->view->set('node_statistics', $this->getNodeStatistics($service_fields->proxmox_node, $module_row));
 			$this->view->set('console_vnc', (object)$vnc_url);
 			$this->view->setDefaultView('components' . DS . 'modules' . DS . 'proxmox' . DS);
