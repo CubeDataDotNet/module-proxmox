@@ -47,6 +47,18 @@
                         $this->Form->fieldText('vmid', (isset($vars->vmid) ? $vars->vmid : $this->_('Proxmox.row_meta.default_vmid', true)), ['id' => 'vmid']);
                         ?>
                     </li>
+					<li>
+                        <?php
+                        $this->Form->label($this->_('Proxmox.row_meta.vncuser', true), 'vncuser');
+                        $this->Form->fieldText('vncuser', (isset($vars->vncuser) ? $vars->vncuser : $this->_('Proxmox.row_meta.default_vncuser', true)), ['id' => 'vncuser']);
+                        ?>
+                    </li>
+					<li>
+                        <?php
+                        $this->Form->label($this->_('Proxmox.row_meta.vncpassword', true), 'vncpassword');
+                        $this->Form->fieldText('vncpassword', (isset($vars->vncpassword) ? $vars->vncpassword : $this->_('Proxmox.row_meta.default_vncpassword', true)), ['id' => 'vncpassword']);
+                        ?>
+                    </li>
                     <li>
                         <?php
                         $this->Form->label($this->_('Proxmox.row_meta.ips', true), 'ips');

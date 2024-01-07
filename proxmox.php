@@ -781,10 +781,10 @@ class Proxmox extends Module
      */
     public function addModuleRow(array &$vars)
     {
-        $meta_fields = ['server_name', 'user', 'password', 'host', 'port',
+        $meta_fields = ['server_name', 'user', 'password', 'vncuser', 'vncpassword', 'host', 'port',
             'vmid', 'ips'
         ];
-        $encrypted_fields = ['user', 'password'];
+        $encrypted_fields = ['user', 'password', 'vncuser', 'vncpassword'];
 
         $this->Input->setRules($this->getRowRules($vars));
 
@@ -1904,42 +1904,46 @@ class Proxmox extends Module
 
         // Load the vserver API
         $api = $this->getApi(
-            $module_row->meta->user,
-            $module_row->meta->password,
+            $module_row->meta->vncuser,
+            $module_row->meta->vncpassword,
             $module_row->meta->host,
             $module_row->meta->port
         );
         $api->loadCommand('proxmox_vserver');
         $server_api = new ProxmoxVserver($api);
-
+		$typeofvm = "";
+		$hostid = $module_row->meta->host;
+		if ($service_fields->proxmox_type == "qemu")
+		{
+				//noVNC Proxy on Proxmox does not like qemu likes it being specified as kvm instead.
+				$typeofvm = "kvm";
+		} else {
+				$typeofvm = "lxc";
+		}
         $params = [
             'vmid' => $service_fields->proxmox_vserver_id,
             'type' => $service_fields->proxmox_type,
             'node' => $service_fields->proxmox_node
         ];
-		
 			//noVNC client is used via Proxmox Node, therefore no need for noVNC files for now.
 			$response = $this->parseResponse($server_api->vnc($params), $module_row);
-			$typeofvm = "";
-			if ($service_fields->proxmox_type == "qemu")
-			{
-				//noVNC Proxy on Proxmox does not like qemu likes it being specified as kvm instead.
-				$typeofvm = "kvm";
-			} else {
-				$typeofvm = "lxc";
-			}
-			$session_params = [
-            'vmid' => $service_fields->proxmox_vserver_id,
-            'type' => $service_fields->proxmox_type,
-            'node' => $service_fields->proxmox_node,
-			'vnc_ticket' => $response->data->ticket,
-			'vnc_portid' => $response->data->port
-			];
-			$vncresponse = $this->parseResponse($server_api->vncgetwebsocketproxy($session_params), $module_row);
-			// Set console info for noVNC
-			$vnc_url = "https://" . $module_row->meta->host . ":" . $module_row->meta->port . "/?console=" . $typeofvm . "&novnc=1&node=" . $service_fields->proxmox_node . "&resize=scale&vmid=" . $service_fields->proxmox_vserver_id . "&path=" . urlencode("api2/json/nodes/". $service_fields->proxmox_node ."/". $typeofvm . "/" .  $service_fields->proxmox_vserver_id ."/vncproxy?port=" . $response->data->port . "&vncticket=" . $response->data->ticket); 
+			// $session_params = [
+            // 'vmid' => $service_fields->proxmox_vserver_id,
+            // 'type' => $typeofvm,
+            // 'node' => $service_fields->proxmox_node,
+			// 'vnc_ticket' => $response->data->ticket,
+			// 'vnc_portid' => $response->data->port
+			// ];
+			// $vncresponse = $this->parseResponse($server_api->vncgetwebsocketproxy($session_params), $module_row);
+			// Set console info and cookie for noVNC
+			 // $path should only contain the actual path without any query parameters
+			$path = 'api2/json/nodes/' . $service_fields->proxmox_node . '/' . $service_fields->proxmox_type . '/' . $service_fields->proxmox_vserver_id . '/vncwebsocket?port=' . $response->data->port . '&vncticket=' . urlencode($response->data->ticket);
+			$url = '/components/modules/proxmox/novnc_router.php?host=' . $hostid . '&pveticket=' . urlencode($response->data->ticket) . '&path=' . urlencode($path) . '&vncticket=' . urlencode($response->data->ticket) . "&portid=" . $response->data->port . "&passwordid=" . $response->data->ticket;
+			//$vnc_url = "https://" . $module_row->meta->host . ":" . $module_row->meta->port . "/?console=" . $typeofvm . "&novnc=1&node=" . $service_fields->proxmox_node . "&resize=scale&vmid=" . $service_fields->proxmox_vserver_id . "&path=" . "api2/json/nodes/". $service_fields->proxmox_node ."/". $typeofvm . "/" .  $service_fields->proxmox_vserver_id ."/vncwebsocket?port=" . $response->data->port . "&vncticket=" . $response->data->ticket;
+			$vncreply='<center><strong>Console (noVNC) prepared for usage. <a href="'.$url.'" target="_blanK">Click here</a> to open the noVNC window.</strong></center>' ; 
 			$this->view->set('node_statistics', $this->getNodeStatistics($service_fields->proxmox_node, $module_row));
-			$this->view->set('console_vnc', $vnc_url);
+			//header('Location: ' . $vnc_url);
+			$this->view->set('console_vnc', $vncreply);
 			$this->view->setDefaultView('components' . DS . 'modules' . DS . 'proxmox' . DS);
 			return $this->view;
     }

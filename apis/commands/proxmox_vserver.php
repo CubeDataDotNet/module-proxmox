@@ -203,7 +203,7 @@ class ProxmoxVserver
     {
         return $this->api->submit(
             'nodes/' . $vars['node'] . '/' . $vars['type'] . '/' . $vars['vmid'] . '/vncproxy',
-            [],
+            ['websocket' => 1],
             'POST'
         );
     }
@@ -219,12 +219,11 @@ class ProxmoxVserver
      */
     public function vncgetwebsocketproxy(array $vars)
     {
-		$websock = $this->api->submit(
+		return $this->api->submit(
             'nodes/' . $vars['node'] . '/' . $vars['type'] . '/' . $vars['vmid'] . '/vncwebsocket',
             ['vncticket' => $vars['vnc_ticket'],'port' => $vars['vnc_portid']],
             'POST'
         );
-		return $websock;
     }
 
     /**

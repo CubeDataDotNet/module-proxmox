@@ -88,11 +88,15 @@ $lang['Proxmox.order_options.first'] = 'First non-full server';
 $lang['Proxmox.row_meta.server_name'] = 'Server Label';
 $lang['Proxmox.row_meta.user'] = 'User (with @pam or @pve after the username)';
 $lang['Proxmox.row_meta.password'] = 'Password';
+$lang['Proxmox.row_meta.vncuser'] = 'User for VNC Usage Only (with @pam or @pve after the username) Follow Instructions Here: https://github.com/CubeDataDotNet/module-proxmox/wiki';
+$lang['Proxmox.row_meta.vncuserpassword'] = 'Password For VNC Usage Only';
 $lang['Proxmox.row_meta.host'] = 'Hostname';
 $lang['Proxmox.row_meta.port'] = 'SSL Port Number';
 $lang['Proxmox.row_meta.vmid'] = 'Next VMID (do not change unless necessary!)';
 $lang['Proxmox.row_meta.default_vmid'] = '200';
 $lang['Proxmox.row_meta.default_port'] = '8006';
+$lang['Proxmox.row_meta.default_vncuser'] = 'vnc@pve';
+$lang['Proxmox.row_meta.default_vncpassword'] = 'Password';
 $lang['Proxmox.row_meta.ips'] = 'IPs (one per line)';
 
 
